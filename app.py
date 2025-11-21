@@ -1,94 +1,50 @@
 import streamlit as st
-import google.generativeai as genai
+import requests
+import json
 import os
-
-# Configure Gemini
-genai.configure(api_key=os.getenv("GOOGLE_API_KEY"))
-model = genai.GenerativeModel('gemini-2.0-flash-exp')
 
 st.set_page_config(
     page_title="Python Learning Coach",
-    page_icon="🐍", 
+    page_icon="🐍",
     layout="wide"
 )
 
 st.title("🐍 Python Learning Coach")
-st.markdown("### Your Complete AI-Powered Learning System")
+st.markdown("### Your AI-Powered Learning System")
 
-# System prompt that simulates all 5 agents
-system_prompt = """
-You are a comprehensive Python Learning Coach with 5 specialized capabilities:
-
-1. 🧠 ASSESSMENT AGENT: Evaluate programming experience and learning goals
-2. 📚 CURRICULUM AGENT: Create personalized learning paths and study plans  
-3. 👨‍🏫 TEACHING AGENT: Explain Python concepts with clear examples and analogies
-4. 💻 PRACTICE AGENT: Generate appropriate coding exercises and challenges
-5. 📊 PROGRESS AGENT: Track learning progress and provide motivational feedback
-
-Adapt your responses based on what the student needs. Be encouraging and patient.
-"""
-
-# Initialize chat history
-if "messages" not in st.session_state:
-    st.session_state.messages = [
-        ("assistant", "🐍 **Welcome to Python Learning Coach!**\n\nI'm your AI tutor with 5 capabilities:\n\n🧠 Assessment - Evaluate your level  \n📚 Curriculum - Create learning plans  \n👨‍🏫 Teaching - Explain concepts  \n💻 Practice - Give exercises  \n📊 Progress - Track your journey\n\n**Try asking:**\n- \"I'm a beginner\"\n- \"Create a curriculum\"  \n- \"Explain variables\"\n- \"Give me an exercise\"\n- \"How am I doing?\"")
-    ]
-
-# Sidebar
-with st.sidebar:
-    st.header("🤖 AI Agents")
-    st.success("🧠 Assessment - Ready")
-    st.info("📚 Curriculum - Ready")
-    st.warning("👨‍🏫 Teaching - Ready") 
-    st.error("💻 Practice - Ready")
-    st.success("📊 Progress - Ready")
+# Simple system without external dependencies
+def get_ai_response(message):
+    """Simulate AI responses with predefined logic"""
+    message_lower = message.lower()
     
-    st.header("🚀 Quick Start")
-    if st.button("I'm a Beginner"):
-        st.session_state.messages.append(("user", "I'm a complete beginner"))
-    if st.button("Get Curriculum"):
-        st.session_state.messages.append(("user", "Create a Python curriculum for me"))
-    if st.button("Practice Exercise"):
-        st.session_state.messages.append(("user", "Give me a coding exercise"))
+    if any(word in message_lower for word in ['beginner', 'start', 'experience']):
+        return """🧠 **Assessment Complete!**
 
-# Display chat messages
-for message in st.session_state.messages:
-    with st.chat_message(message[0]):
-        st.markdown(message[1])
+I recommend starting with Python fundamentals.
 
-# Chat input
-if prompt := st.chat_input("Ask about Python learning..."):
-    # Add user message
-    st.session_state.messages.append(("user", prompt))
-    with st.chat_message("user"):
-        st.markdown(prompt)
-    
-    # Generate AI response
-    try:
-        # Build conversation context
-        conversation = system_prompt + "\n\nRecent conversation:\n"
-        for msg in st.session_state.messages[-6:]:
-            role = "Student" if msg[0] == "user" else "Tutor"
-            conversation += f"{role}: {msg[1]}\n"
-        
-        conversation += f"Student: {prompt}\nTutor:"
-        
-        response = model.generate_content(conversation)
-        
-        # Add assistant response
-        st.session_state.messages.append(("assistant", response.text))
-        with st.chat_message("assistant"):
-            st.markdown(response.text)
-            
-    except Exception as e:
-        error_msg = f"⚠️ System temporarily unavailable. Please try again."
-        st.session_state.messages.append(("assistant", error_msg))
-        with st.chat_message("assistant"):
-            st.markdown(error_msg)
+**Your Learning Path:**
+🎯 Level: Beginner  
+📅 Duration: 6 weeks  
+💡 Focus: Basic syntax, variables, simple programs
 
-# Clear chat button
-if st.button("Clear Chat"):
-    st.session_state.messages = [
-        ("assistant", "Chat cleared! How can I help you learn Python today?")
-    ]
-    st.rerun()
+Ready to create your curriculum?"""
+
+    elif any(word in message_lower for word in ['curriculum', 'plan', 'learn']):
+        return """📚 **Python Fundamentals Curriculum**
+
+**Week 1-2:** Python Basics & Variables
+**Week 3-4:** Control Structures & Loops  
+**Week 5-6:** Functions & Projects
+
+Want me to explain any concepts?"""
+
+    elif any(word in message_lower for word in ['explain', 'teach', 'variable']):
+        return """👨‍🏫 **Teaching: Variables**
+
+Variables store data values in Python.
+
+**Examples:**
+```python
+name = "Alice"
+age = 25
+height = 5.9
