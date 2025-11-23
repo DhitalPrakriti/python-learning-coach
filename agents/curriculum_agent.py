@@ -1,14 +1,18 @@
 
 from google.adk.agents import Agent
 from google.adk.tools.function_tool import FunctionTool
-from google.adk.models.google_llm import Gemini
-from typing import Dict, List
-import os
+from typing import Dict, List, Any
+import vertexai
 
-GOOGLE_API_KEY = os.environ.get("GOOGLE_API_KEY")
-
-def generate_python_curriculum(experience_level: str, learning_goals: str, focus_areas: List[str] = None) -> Dict:
+def generate_python_curriculum(
+    experience_level: str, 
+    learning_goals: str = "general Python proficiency", 
+    focus_areas: str = None
+) -> Dict[str, Any]:
     """Generate personalized Python learning curriculum based on assessment"""
+    
+    # Parse focus_areas if provided as comma-separated string
+    focus_list = focus_areas.split(",") if focus_areas else ["core programming concepts"]
     
     # Comprehensive curriculum templates
     python_curricula = {
@@ -183,39 +187,49 @@ def generate_python_curriculum(experience_level: str, learning_goals: str, focus
         "description": curriculum["description"],
         "experience_level": experience_level,
         "learning_goals": learning_goals,
-        "focus_areas": focus_areas or ["core programming concepts"],
+        "focus_areas": focus_list,
         "weekly_plan": curriculum["weekly_plan"],
         "recommended_resources": curriculum["resources"],
         "recommended_pace": curriculum["pace"],
         "key_milestones": curriculum["milestones"],
         "total_weeks": len(curriculum["weekly_plan"]),
         "success_tips": [
-            "Practice coding daily",
+            "Practice coding daily, even for 15 minutes",
             "Build projects to reinforce learning", 
             "Join Python communities for support",
-            "Don't hesitate to ask for help"
+            "Don't hesitate to ask questions"
         ]
     }
 
 # Create the curriculum tool
 curriculum_tool = FunctionTool(generate_python_curriculum)
 
-# Create the curriculum agent
-curriculum_agent = Agent(
-    name="CurriculumAgent",
-    model=Gemini(
-        model_name="gemini-2.0-flash-exp",
-        api_key=GOOGLE_API_KEY
-    ),
-    instruction="""You are an expert Python curriculum designer. Your job is to create personalized learning paths based on the user's experience level and goals.
+def create_curriculum_agent():
+    """Factory function to create the curriculum agent"""
+    return Agent(
+        name="curriculum_agent",
+        model="gemini-1.5-flash-001",
+        description="Expert Python curriculum designer that creates personalized learning paths",
+        instruction="""
+        You are an expert Python curriculum designer. Your job is to create personalized learning paths based on the user's experience level and goals.
 
-When a user provides their experience level (beginner/intermediate/advanced) and learning goals:
-1. Use the generate_python_curriculum tool to create a comprehensive learning plan
-2. Provide a structured weekly breakdown with lessons and practice projects
-3. Recommend appropriate learning resources
-4. Set clear milestones and success tips
-5. Be encouraging and specific about what they'll achieve
+        When a user provides their experience level (beginner/intermediate/advanced) and learning goals:
+        1. Use the generate_python_curriculum tool to create a comprehensive learning plan
+        2. Provide a structured weekly breakdown with lessons and practice projects
+        3. Recommend appropriate learning resources
+        4. Set clear milestones and success tips
+        5. Be encouraging and specific about what they'll achieve
 
-Always start by acknowledging their goals and experience level, then present the curriculum in a clear, organized way.""",
-    tools=[curriculum_tool]
-)
+        **Key Responsibilities:**
+        - Design realistic, achievable learning timelines (6-8 weeks)
+        - Balance theory with hands-on practice projects
+        - Recommend quality resources appropriate for their level
+        - Set measurable milestones to track progress
+        
+        Always start by acknowledging their goals and experience level, then present the curriculum in a clear, organized way.
+        Emphasize that consistency and practice are more important than speed.
+        """,
+        tools=[curriculum_tool]
+    )
+
+print("✅ Curriculum Agent module loaded")
