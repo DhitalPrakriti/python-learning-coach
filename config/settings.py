@@ -1,14 +1,16 @@
 import os
-from kaggle_secrets import UserSecretsClient
+import vertexai
 
-# API Configuration
-GOOGLE_API_KEY = UserSecretsClient().get_secret("GOOGLE_API_KEY")
-os.environ["GOOGLE_API_KEY"] = GOOGLE_API_KEY
-MODEL_NAME = "gemini-2.0-flash-exp"
+# Vertex AI Configuration
+PROJECT_ID = "python-learning-coach-ai"
+LOCATION = "us-central1"
+
+# Model Configuration - Use proven model
+MODEL_NAME = "gemini-1.5-flash-001"
 
 # Learning Configuration
 DEFAULT_SUBJECT = "python"
 SUPPORTED_LEVELS = ["beginner", "intermediate", "advanced"]
 LEARNING_STYLES = ["visual", "auditory", "kinesthetic", "adaptive"]
 
-print("✅ Learning Coach configuration loaded")
+print("✅ Vertex AI Learning Coach configuration loaded")
