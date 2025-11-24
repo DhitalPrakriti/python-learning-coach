@@ -40,22 +40,8 @@ Python Learning Coach is an AI-powered multi-agent system designed to help stude
 
 **Framework**: ADK (Agent Development Kit)
 
-python_learning_coach_deploy/
-├── agent.py                    # Main ADK agent orchestrator
-├── requirements.txt            # Dependencies
-├── .env                       # Environment variables
-├── .agent_engine_config.json  # Deployment configuration
-├── agents/                    # Specialized agent modules
-│   ├── __init__.py
-│   ├── assessment_agent.py
-│   ├── curriculum_agent.py
-│   ├── teaching_agent.py
-│   ├── practice_agent.py
-│   └── progress_agent.py
-└── config/
-    └── settings.py
-    
 **🚀 Deployment Status**
+
 **✅ Agent Structure**: Working locally with ADK
 
 **✅ Model Access**: Gemini 1.0 Pro available
