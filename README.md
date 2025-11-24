@@ -3,6 +3,7 @@
 Python Learning Coach is an AI-powered multi-agent system designed to help students learn Python programming through personalized coaching, assessment, curriculum planning, and progress tracking.
 
 🎯 Features
+
 **🤖 Multi-Agent Architecture**: 5 specialized AI agents working together
 **📊 Skill Assessment**: Evaluate student's current Python level
 **📚 Curriculum Planning**: Personalized learning paths (6-8 weeks)
@@ -11,7 +12,9 @@ Python Learning Coach is an AI-powered multi-agent system designed to help stude
 **📈 Progress Tracking**: Monitor learning journey and achievements
 
 **🏗️ System Architecture**
+
 **Agent Components:**
+
 **Assessment Agent** - Evaluates student skill level
 **Curriculum Agent** - Creates personalized learning plans
 **Teaching Agent** - Explains Python concepts clearly
@@ -19,6 +22,7 @@ Python Learning Coach is an AI-powered multi-agent system designed to help stude
 **Progress Agent** - Tracks learning milestones
 
 **Tech Stack:**
+
 **Backend:** Python, Flask, Vertex AI Agent Engine
 **AI Models:** Google Gemini 1.0 Pro
 **Deployment**: Google Cloud Platform (Vertex AI Agent Engine)
@@ -46,7 +50,6 @@ python_learning_coach_deploy/
 **🎯 Next Step:** Final deployment to production
 
 **🔧 Setup & Installation**
-**Prerequisites:**
 Python 3.11+
 Google Cloud Project with billing enabled
 Vertex AI API enabled
