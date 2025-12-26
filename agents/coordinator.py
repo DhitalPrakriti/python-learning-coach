@@ -4,6 +4,8 @@ import os
 from datetime import datetime
 from typing import Dict, Any
 
+load_dotenv()
+
 # IMPORT ALL AGENTS
 from agents.teaching_agent import create_teaching_agent
 from agents.assessment_agent import create_assessment_agent
@@ -17,7 +19,7 @@ class LearningCoachCoordinator:
         
         # --- API KEY SETUP ---
         # written by fix_coordinator.py
-        api_key = "AIzaSyC-cQiSMZXslKcpCR0yOE_1c3YZi2PzrQA"
+        api_key = os.getenv("GEMINI_API_KEY")
         
         # Initialize the client
         # We use v1beta because that is often safer for newer models
