@@ -32,9 +32,9 @@ def run_async(coro):
     
     return loop.run_until_complete(coro)
 
-# ==========================================
+
 # 2. DOCKER HEALTH CHECK
-# ==========================================
+
 @app.route('/health', methods=['GET'])
 def health():
     """Required for Docker HEALTHCHECK and Cloud Run Liveness Probes"""
@@ -44,9 +44,8 @@ def health():
         'active_users': len(coordinator.user_contexts)
     }), 200
 
-# ==========================================
 # 3. INTELLIGENT ROUTER
-# ==========================================
+=
 def determine_agent(message: str, user_id: str) -> str:
     """Heuristic logic to route the user to the correct expert agent"""
     msg = message.lower()
