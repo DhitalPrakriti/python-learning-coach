@@ -1,0 +1,28 @@
+# === Core Dependencies ===
+google-adk
+vertexai
+#google-cloud-aiplatform>=1.60.0
+
+# === Web Framework ===
+flask>=3.0.0
+gunicorn>=21.0.0
+werkzeug>=3.0.0
+
+# === Conpython -m pip cache purgefiguration ===
+python-dotenv>=1.0.0
+
+# === Data Validation ===
+pydantic>=2.0.0
+
+# === Utilities ===
+requests>=2.31.0
+pyyaml>=6.0
+click>=8.1.0
+
+# === Security ===
+cryptography>=41.0.0
+
+# === Development (optional) ===
+# black>=23.0.0
+# flake8>=6.0.0
+# pytest>=7.4.0
