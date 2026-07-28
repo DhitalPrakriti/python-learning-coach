@@ -1,6 +1,8 @@
 from google import genai
-from google.genai import types
 from typing import Dict, Any
+
+from .base_agent import BaseGenAIAgent
+from .prompts import AGENT_PROMPTS
 
 # ==========================================
 # 1. YOUR CURRICULUM LOGIC (The "Brain")
@@ -81,39 +83,16 @@ def generate_python_curriculum(
     }
 
 # ==========================================
-# 2. THE NEW AGENT CLASS (The "Body")
+# 2. THE AGENT CLASS (The "Body")
 # ==========================================
-class GenAICurriculumAgent:
-    def __init__(self, client: genai.Client):
-        self.client = client
-        self.model_id = "gemini-2.5-flash"
-        
-        # KEY CHANGE: Pass the function directly!
-        self.tools = [generate_python_curriculum]
+class GenAICurriculumAgent(BaseGenAIAgent):
+    name = "curriculum"
+    tools = [generate_python_curriculum]
+    system_instruction = AGENT_PROMPTS["curriculum"]
 
-    def query(self, message: str) -> str:
-        try:
-            response = self.client.models.generate_content(
-                model=self.model_id,
-                contents=message,
-                config=types.GenerateContentConfig(
-                    tools=self.tools,  # <--- Tool enabled
-                    system_instruction="""
-                    You are an expert Python curriculum designer. 
-                    When a user asks for a learning path, use 'generate_python_curriculum'.
-                    1. Generate the plan based on their level.
-                    2. Present the weekly schedule clearly.
-                    3. Encourage them to start Week 1.
-                    """
-                )
-            )
-            return response.text
-        except Exception as e:
-            return f"Agent Error: {str(e)}"
 
 # ==========================================
 # 3. THE FACTORY
 # ==========================================
-# IMPORTANT: This function now accepts the 'client' argument!
 def create_curriculum_agent(client: genai.Client):
     return GenAICurriculumAgent(client)

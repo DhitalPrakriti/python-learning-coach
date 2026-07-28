@@ -6,9 +6,9 @@ ARG USERNAME=appuser
 ARG USER_UID=1000
 ARG USER_GID=1000
 
-# Install system dependencies required for some Python packages
-RUN apt-get update && apt-get install -y \
-    build-essential \
+# curl is needed by the HEALTHCHECK below. No compiler is installed: every
+# dependency ships a manylinux wheel, and build-essential added ~400MB.
+RUN apt-get update && apt-get install -y --no-install-recommends \
     curl \
     && rm -rf /var/lib/apt/lists/*
 
@@ -40,9 +40,12 @@ ENV PYTHONPATH=/app
 # Expose port (for documentation)
 EXPOSE 8080
 
-# Health check
-HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
-    CMD curl -f http://localhost:8080/health || exit 1
+# Health check. Kept on one line so linters don't read the HEALTHCHECK's own
+# CMD as a second container CMD. Uses $PORT so it follows an overridden port.
+HEALTHCHECK --interval=30s --timeout=10s --start-period=10s --retries=3 CMD curl -fsS "http://localhost:${PORT}/health" || exit 1
 
-# Use gunicorn for production instead of python main.py
-CMD exec gunicorn --bind :$PORT --workers 2 --threads 4 --timeout 0  --worker-tmp-dir /dev/shm main:app
+# Use gunicorn for production instead of python main.py.
+# --timeout 120 rather than 0: an unbounded timeout means a hung Gemini call
+# pins a worker forever instead of failing and freeing the slot.
+CMD exec gunicorn --bind :$PORT --workers 2 --threads 4 --timeout 120 \
+    --graceful-timeout 30 --worker-tmp-dir /dev/shm --access-logfile - main:app

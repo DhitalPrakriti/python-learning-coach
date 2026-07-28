@@ -1,0 +1,104 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Python Learning Coach</title>
+    <link rel="stylesheet" href="/static/styles.css" />
+  </head>
+  <body>
+    <main class="app-shell">
+      <header class="topbar">
+        <div>
+          <div class="eyebrow">Python Learning Coach</div>
+          <h1>Learning Workspace</h1>
+        </div>
+        <div class="runtime">
+          <span id="modeBadge">checking</span>
+          <span id="modelBadge">model</span>
+        </div>
+      </header>
+
+      <aside class="sidebar panel">
+        <div class="field">
+          <label for="userId">Learner</label>
+          <input id="userId" type="text" value="demo" autocomplete="off" />
+        </div>
+
+        <div class="profile-grid">
+          <div>
+            <span class="metric-label">Level</span>
+            <strong id="skillLevel">unknown</strong>
+          </div>
+          <div>
+            <span class="metric-label">Style</span>
+            <strong id="learningStyle">adaptive</strong>
+          </div>
+          <div>
+            <span class="metric-label">Turns</span>
+            <strong id="turnCount">0</strong>
+          </div>
+          <div>
+            <span class="metric-label">Practice (done/given)</span>
+            <strong id="practiceCount">0/0</strong>
+          </div>
+        </div>
+
+        <div class="agent-list" aria-label="Agent routing">
+          <button class="agent-chip" data-prompt="Assess my current Python skill level">Assessment</button>
+          <button class="agent-chip" data-prompt="Create a Python learning roadmap for me">Curriculum</button>
+          <button class="agent-chip" data-prompt="Explain Python functions with a short example">Teaching</button>
+          <button class="agent-chip" data-prompt="Give me a practice exercise on loops">Practice</button>
+          <button class="agent-chip" data-prompt="Show my progress and suggest next steps">Progress</button>
+        </div>
+
+        <button id="resetBtn" class="secondary full-width">Reset Session</button>
+      </aside>
+
+      <section class="coach panel">
+        <div class="panel-header">
+          <div>
+            <h2>Coach</h2>
+            <p id="lastRoute">No route yet</p>
+          </div>
+          <button id="clearLocalBtn" class="secondary">Clear View</button>
+        </div>
+
+        <div id="banner" class="banner hidden" role="status"></div>
+
+        <div id="chatLog" class="chat-log" aria-live="polite"></div>
+        <div id="typing" class="typing hidden">Coach is working...</div>
+
+        <form id="composer" class="composer">
+          <textarea id="message" rows="3" placeholder="Ask about Python, request a roadmap, or ask for practice."></textarea>
+          <button id="sendBtn" type="submit">Send</button>
+        </form>
+      </section>
+
+      <aside class="inspector panel">
+        <div class="panel-header">
+          <div>
+            <h2>Session</h2>
+            <p id="sourceLine">Waiting for first response</p>
+          </div>
+        </div>
+
+        <div class="section">
+          <h3>Topics</h3>
+          <div id="topicList" class="tag-list"></div>
+        </div>
+
+        <div class="section">
+          <h3>Next Moves</h3>
+          <div class="prompt-stack">
+            <button data-prompt="I am confused. Explain it in simpler terms.">Simplify</button>
+            <button data-prompt="Give me a small challenge based on the last topic.">Challenge</button>
+            <button data-prompt="Create a 4-week Python plan for my current level.">Plan</button>
+          </div>
+        </div>
+      </aside>
+    </main>
+
+    <script src="/static/app.js"></script>
+  </body>
+</html>

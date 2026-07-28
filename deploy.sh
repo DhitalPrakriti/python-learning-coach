@@ -1,52 +1,64 @@
-#!/bin/bash
+#!/usr/bin/env bash
+set -euo pipefail
 
-# Configuration
-PROJECT_ID="python-learning-coach-ai"
-REGION="us-central1"
 SERVICE_NAME="python-learning-coach"
-DEPLOYMENT_DIR="python_learning_coach_deploy"
+REGION="northamerica-northeast2"
+VERTEX_LOCATION="${VERTEX_LOCATION:-northamerica-northeast1}"
 
-echo "🚀 Deploying Python Learning Coach to Cloud Run"
-echo "=============================================="
+# You can optionally export GOOGLE_CLOUD_PROJECT, otherwise it uses gcloud config
+PROJECT_ID="${GOOGLE_CLOUD_PROJECT:-$(gcloud config get-value project 2>/dev/null)}"
 
-# 1. Set the project
-gcloud config set project ${PROJECT_ID}
+# Artifact Registry repo name (create once)
+AR_REPO="python-learning-coach"
 
-# 2. Build and push Docker image
-echo "📦 Building Docker image..."
-IMAGE_NAME="gcr.io/${PROJECT_ID}/${SERVICE_NAME}"
-cd ${DEPLOYMENT_DIR}
-docker build -t ${IMAGE_NAME}:latest .
-docker push ${IMAGE_NAME}:latest
+if [ -z "${PROJECT_ID}" ] || [ "${PROJECT_ID}" = "(unset)" ]; then
+  echo "ERROR: Set your project first:"
+  echo "  gcloud config set project YOUR_PROJECT_ID"
+  exit 1
+fi
 
-# 3. Deploy to Cloud Run
-echo "☁️ Deploying to Cloud Run..."
-gcloud run deploy ${SERVICE_NAME} \
-    --image ${IMAGE_NAME}:latest \
-    --platform managed \
-    --region ${REGION} \
-    --allow-unauthenticated \
-    --memory 4Gi \
-    --cpu 2 \
-    --timeour 300 \
-    --min-instances 0 \
-    --max-instances 2 \
-    --set-env-vars "GOOGLE_CLOUD_PROJECT=${PROJECT_ID}" \
-    --set-env-vars "GOOGLE_CLOUD_LOCATION=${REGION}" \
-    --set-env-vars "GOOGLE_GENAI_USE_VERTEXAI=1" \
-    --set-env-vars "ADK_MODEL=gemini-1.5-flash-001"
+# Artifact Registry image URL (NOT gcr.io)
+IMAGE_NAME="${REGION}-docker.pkg.dev/${PROJECT_ID}/${AR_REPO}/${SERVICE_NAME}"
 
-# 4. Get service URL
-SERVICE_URL=$(gcloud run services describe ${SERVICE_NAME} \
-    --region ${REGION} \
-    --format "value(status.url)")
+echo "Project: ${PROJECT_ID}"
+echo "Region: ${REGION}"
+echo "Vertex: ${VERTEX_LOCATION}"
+echo "Repo:   ${AR_REPO}"
+echo "Image:  ${IMAGE_NAME}:latest"
 
-echo ""
-echo "🎉 Deployment Complete!"
-echo "======================"
-echo "Service URL: ${SERVICE_URL}"
-echo ""
-echo "📋 Test Endpoints:"
-echo "   Health: ${SERVICE_URL}/health"
-echo "   Chat: ${SERVICE_URL}/chat"
-echo "   Curriculum: ${SERVICE_URL}/curriculum"
+echo "Enabling required services..."
+gcloud services enable \
+  run.googleapis.com \
+  cloudbuild.googleapis.com \
+  artifactregistry.googleapis.com \
+  aiplatform.googleapis.com \
+  --project "${PROJECT_ID}"
+
+echo "Ensuring Artifact Registry repo exists..."
+# If it already exists, this will fail — we ignore that.
+gcloud artifacts repositories create "${AR_REPO}" \
+  --repository-format=docker \
+  --location="${REGION}" \
+  --description="Docker images for ${SERVICE_NAME}" \
+  --project "${PROJECT_ID}" \
+  2>/dev/null || echo "Repo '${AR_REPO}' already exists."
+
+echo "Building image with Cloud Build..."
+gcloud builds submit --tag "${IMAGE_NAME}:latest" --project "${PROJECT_ID}" .
+
+echo "Deploying to Cloud Run..."
+gcloud run deploy "${SERVICE_NAME}" \
+  --image "${IMAGE_NAME}:latest" \
+  --region "${REGION}" \
+  --platform managed \
+  --allow-unauthenticated \
+  --port 8080 \
+  --timeout 300 \
+  --project "${PROJECT_ID}" \
+  --set-env-vars "FIRESTORE_ENABLED=1,GOOGLE_GENAI_USE_VERTEXAI=1,GOOGLE_CLOUD_PROJECT=${PROJECT_ID},GOOGLE_CLOUD_LOCATION=${VERTEX_LOCATION}"
+
+echo "Service URL:"
+gcloud run services describe "${SERVICE_NAME}" \
+  --region "${REGION}" \
+  --project "${PROJECT_ID}" \
+  --format="value(status.url)"

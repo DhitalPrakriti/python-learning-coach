@@ -1,14 +1,15 @@
 # === Core Dependencies ===
-google-adk
-vertexai
-#google-cloud-aiplatform>=1.60.0
+# Lower bound, not floating: agents/base_agent.py relies on the 2.x
+# AutomaticFunctionCallingConfig, which does not exist in 1.x.
+google-genai>=2.0.0,<3.0.0
+google-cloud-firestore>=2.16.0
 
 # === Web Framework ===
 flask>=3.0.0
 gunicorn>=21.0.0
 werkzeug>=3.0.0
 
-# === Conpython -m pip cache purgefiguration ===
+# === Configuration ===
 python-dotenv>=1.0.0
 
 # === Data Validation ===
@@ -22,7 +23,5 @@ click>=8.1.0
 # === Security ===
 cryptography>=41.0.0
 
-# === Development (optional) ===
-# black>=23.0.0
-# flake8>=6.0.0
-# pytest>=7.4.0
+# === Development ===
+# Dev/test tooling lives in requirements-dev.txt so it stays out of the image.

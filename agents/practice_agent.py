@@ -1,6 +1,8 @@
 from google import genai
-from google.genai import types
 from typing import Dict, Any
+
+from .base_agent import BaseGenAIAgent
+from .prompts import AGENT_PROMPTS
 
 # ==========================================
 # 1. YOUR PRACTICE LOGIC (The "Brain")
@@ -140,36 +142,13 @@ def generate_python_exercise(
     }
 
 # ==========================================
-# 2. THE NEW AGENT CLASS (The "Body")
+# 2. THE AGENT CLASS (The "Body")
 # ==========================================
-class GenAIPracticeAgent:
-    def __init__(self, client: genai.Client):
-        self.client = client
-        self.model_id = "gemini-2.5-flash"
-        
-        # KEY CHANGE: Pass the function directly!
-        self.tools = [generate_python_exercise]
+class GenAIPracticeAgent(BaseGenAIAgent):
+    name = "practice"
+    tools = [generate_python_exercise]
+    system_instruction = AGENT_PROMPTS["practice"]
 
-    def query(self, message: str) -> str:
-        try:
-            response = self.client.models.generate_content(
-                model=self.model_id,
-                contents=message,
-                config=types.GenerateContentConfig(
-                    tools=self.tools,
-                    system_instruction="""
-                    You are a Python practice exercise generator.
-                    When a student needs practice:
-                    1. Use the 'generate_python_exercise' tool to create a challenge.
-                    2. Present the Problem, Hints, and Success Criteria.
-                    3. Do NOT show the solution unless explicitly asked or after they try.
-                    4. Encourage them to write the code themselves.
-                    """
-                )
-            )
-            return response.text
-        except Exception as e:
-            return f"Agent Error: {str(e)}"
 
 # ==========================================
 # 3. THE FACTORY

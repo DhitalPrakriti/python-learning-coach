@@ -24,5 +24,3 @@ __all__ = [
     # Coordinator
     'LearningCoachCoordinator'
 ]
-
-print("✅ Agents package initialized with coordinator")
