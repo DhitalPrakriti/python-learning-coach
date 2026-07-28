@@ -22,13 +22,34 @@ UI, context memory, and optional Firestore persistence.
 
 ---
 
+## Documentation
+
+- [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) - full architecture: component
+  layout, request lifecycle, routing rules, memory model, failure handling, and
+  known limitations.
+- `docs/Python_Learning_Coach_Architecture.docx` - the same document as Word.
+  Regenerate after editing the Markdown:
+
+  ```bash
+  pip install -r requirements-dev.txt
+  python tools/md_to_docx.py docs/ARCHITECTURE.md docs/Python_Learning_Coach_Architecture.docx
+  ```
+
+---
+
 ## Project Structure
 
-- `main.py` - Flask app + routing
+- `main.py` - Flask app + intent router
 - `agents/` - Agent implementations and tool functions
+  - `base_agent.py` - shared Gemini call layer, error classification, model fallback
+  - `coordinator.py` - orchestration, learner memory, retry policy, local fallback
+  - `prompts.py` - all five system instructions
+- `config/settings.py` - environment configuration
 - `templates/` - Web UI HTML
 - `static/` - Web UI CSS and JS
 - `storage/` - Firestore persistence layer
+- `tests/` - test suite (runs with no credentials)
+- `tools/` - repo tooling (docs generation)
 - `deploy.sh` - Cloud Run deployment script
 - `agent_health_check.py` - Agent routing verification
 
