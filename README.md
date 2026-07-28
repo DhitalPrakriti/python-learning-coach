@@ -24,16 +24,27 @@ UI, context memory, and optional Firestore persistence.
 
 ## Documentation
 
-- [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) - full architecture: component
-  layout, request lifecycle, routing rules, memory model, failure handling, and
-  known limitations.
-- `docs/Python_Learning_Coach_Architecture.docx` - the same document as Word.
-  Regenerate after editing the Markdown:
+Two documents, both available as Markdown and Word:
 
-  ```bash
-  pip install -r requirements-dev.txt
-  python tools/md_to_docx.py docs/ARCHITECTURE.md docs/Python_Learning_Coach_Architecture.docx
-  ```
+| Document | Length | Use it for |
+| --- | --- | --- |
+| [`docs/SYSTEM_ARCHITECTURE.md`](docs/SYSTEM_ARCHITECTURE.md) | 20 sections, 27 tables | Complete reference: every module, class, tool function, endpoint, and data flow |
+| [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) | 11 sections | Shorter orientation for someone new to the project |
+
+The `.docx` versions sit alongside them:
+
+- `docs/Python_Learning_Coach_System_Architecture.docx`
+- `docs/Python_Learning_Coach_Architecture.docx`
+
+Markdown is the source of truth. Regenerate Word after editing it, rather than
+editing the `.docx` directly:
+
+```bash
+pip install -r requirements-dev.txt
+python tools/md_to_docx.py docs/SYSTEM_ARCHITECTURE.md \
+    docs/Python_Learning_Coach_System_Architecture.docx \
+    --title "Python Learning Coach" --subtitle "System Architecture"
+```
 
 ---
 
