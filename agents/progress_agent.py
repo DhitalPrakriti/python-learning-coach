@@ -1,7 +1,9 @@
 from google import genai
-from google.genai import types
 from typing import Dict, Any
 from datetime import datetime
+
+from .base_agent import BaseGenAIAgent
+from .prompts import AGENT_PROMPTS
 
 # ==========================================
 # 1. YOUR PROGRESS LOGIC (The "Brain")
@@ -133,36 +135,13 @@ def suggest_next_steps(current_level: str, topics_mastered: str) -> Dict[str, An
     }
 
 # ==========================================
-# 2. THE NEW AGENT CLASS (The "Body")
+# 2. THE AGENT CLASS (The "Body")
 # ==========================================
-class GenAIProgressAgent:
-    def __init__(self, client: genai.Client):
-        self.client = client
-        self.model_id = "gemini-2.5-flash"
-        
-        # KEY CHANGE: Pass functions directly!
-        self.tools = [track_learning_progress, generate_progress_report, suggest_next_steps]
+class GenAIProgressAgent(BaseGenAIAgent):
+    name = "progress"
+    tools = [track_learning_progress, generate_progress_report, suggest_next_steps]
+    system_instruction = AGENT_PROMPTS["progress"]
 
-    def query(self, message: str) -> str:
-        try:
-            response = self.client.models.generate_content(
-                model=self.model_id,
-                contents=message,
-                config=types.GenerateContentConfig(
-                    tools=self.tools,
-                    system_instruction="""
-                    You are a motivational learning coach.
-                    1. Use 'track_learning_progress' to analyze user stats and badges.
-                    2. Use 'generate_progress_report' for summaries.
-                    3. Use 'suggest_next_steps' to guide them forward.
-                    
-                    Always be encouraging, celebrate small wins (Badges), and provide data-driven advice.
-                    """
-                )
-            )
-            return response.text
-        except Exception as e:
-            return f"Agent Error: {str(e)}"
 
 # ==========================================
 # 3. THE FACTORY

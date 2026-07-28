@@ -1,4 +1,13 @@
 venv/
+.venv/
 __pycache__/
 *.pyc
 .env
+
+# Local scratch clone of the GitHub remote, not part of the project.
+_github_remote_main/
+
+# Test/tooling artifacts
+.pytest_cache/
+.coverage
+htmlcov/

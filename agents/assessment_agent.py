@@ -1,16 +1,16 @@
 from google import genai
-from google.genai import types
 from typing import Dict, Any
 
-# ==========================================
-# 1. YOUR ASSESSMENT LOGIC (The "Brain")
-# ==========================================
-# (I kept your exact functions!)
+from .base_agent import BaseGenAIAgent
+from .prompts import AGENT_PROMPTS
+
+# 1. ASSESSMENT LOGIC (The "Brain")
+
 
 def assess_learning_profile(
     experience: str, 
     learning_style: str = "adaptive", 
-    subject: str = "python"
+    subject: str = "python"     
 ) -> Dict[str, Any]:
     """Create personalized learning profile based on experience level"""
     
@@ -93,36 +93,13 @@ def assess_with_code_sample(code_sample: str) -> Dict[str, Any]:
     }
 
 # ==========================================
-# 2. THE NEW AGENT CLASS (The "Body")
+# 2. THE AGENT CLASS (The "Body")
 # ==========================================
-class GenAIAssessmentAgent:
-    def __init__(self, client: genai.Client):
-        self.client = client
-        self.model_id = "gemini-2.5-flash"
-        
-        # KEY CHANGE: Pass the raw functions directly!
-        self.tools = [assess_learning_profile, analyze_student_input, assess_with_code_sample]
+class GenAIAssessmentAgent(BaseGenAIAgent):
+    name = "assessment"
+    tools = [assess_learning_profile, analyze_student_input, assess_with_code_sample]
+    system_instruction = AGENT_PROMPTS["assessment"]
 
-    def query(self, message: str) -> str:
-        try:
-            response = self.client.models.generate_content(
-                model=self.model_id,
-                contents=message,
-                config=types.GenerateContentConfig(
-                    tools=self.tools,  # <--- Tools enabled
-                    system_instruction="""
-                    You are an expert Python learning assessment specialist.
-                    1. If the user describes themselves, use 'analyze_student_input'.
-                    2. If the user provides code, use 'assess_with_code_sample'.
-                    3. ALWAYS finish by using 'assess_learning_profile' to generate a plan.
-                    
-                    Be encouraging, honest, and specific.
-                    """
-                )
-            )
-            return response.text
-        except Exception as e:
-            return f"Agent Error: {str(e)}"
 
 # ==========================================
 # 3. THE FACTORY

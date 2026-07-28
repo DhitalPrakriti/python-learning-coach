@@ -1,6 +1,8 @@
 from google import genai
-from google.genai import types
 from typing import Dict, Any
+
+from .base_agent import BaseGenAIAgent
+from .prompts import AGENT_PROMPTS
 
 def teach_python_concept(
     topic: str, 
@@ -131,41 +133,13 @@ def teach_python_concept(
         ]
     }
 
-# 2. THE NEW AGENT CLASS (The "Body")
+# 2. THE AGENT CLASS (The "Body")
 # ==========================================
-class GenAITeachingAgent:
-    def __init__(self, client: genai.Client):
-        self.client = client
-        self.model_id = "gemini-2.5-flash"
-        
-        # KEY CHANGE: We put the RAW function in a list. 
-        # No 'FunctionTool' wrapper needed!
-        self.tools = [teach_python_concept]
+class GenAITeachingAgent(BaseGenAIAgent):
+    name = "teaching"
+    tools = [teach_python_concept]
+    system_instruction = AGENT_PROMPTS["teaching"]
 
-    def query(self, message: str) -> str:
-        """
-        Sends the message to Gemini with the tools enabled.
-        The SDK handles the 'Function Calling' automatically.
-        """
-        try:
-            response = self.client.models.generate_content(
-                model=self.model_id,
-                contents=message,
-                config=types.GenerateContentConfig(
-                    tools=self.tools,  # <--- We pass the tool here
-                    system_instruction="""
-                        You are a patient Python teacher. 
-                        When asked about a topic, YOU MUST USE the 'teach_python_concept' tool 
-                        to get the lesson plan, then explain it to the student.
-                    """
-                )
-            )
- 
-            # The model will run the tool internally and give you the final text
-            return response.text
-            
-        except Exception as e:
-            return f"Agent Error: {str(e)}"
 
 # ==========================================
 # 3. THE FACTORY
